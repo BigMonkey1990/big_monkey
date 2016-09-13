@@ -1,0 +1,161 @@
+乐视笔试题目：
+题目描述
+卢卡斯的驱逐者大军已经来到了赫柏的卡诺萨城，赫柏终于下定决心,集结了大军,与驱逐者全面开战。 
+卢卡斯的手下有6名天之驱逐者，这6名天之驱逐者各赋异能，是卢卡斯的主力。 
+为了击败卢卡斯，赫柏必须好好考虑如何安排自己的狂战士前去迎战。 
+狂战士的魔法与一些天之驱逐者的魔法属性是相克的，第i名狂战士的魔法可以克制的天之驱逐者的集合为Si(Si中的每个元素属于[0,5])。 
+为了公平，两名狂战士不能攻击同一个天之驱逐者。 
+现在赫柏需要知道共有多少种分派方案。 
+例： 
+S1={01},S2={23}，代表编号为0的狂战士的魔法可以克制编号为0和编号为1的天之驱逐者，编号为1的狂战士的魔法可以克制编号为2和编号为3的天之驱逐者，共有四种方案：02,03,12,13。 
+02---代表第一个狂战士负责编号为0的驱逐者，第二个狂战士负责编号为2的驱逐者； 
+03---代表第一个狂战士负责编号为0的驱逐者，第二个狂战士负责编号为3的驱逐者； 
+12---代表第一个狂战士负责编号为1的驱逐者，第二个狂战士负责编号为2的驱逐者; 
+13---代表第一个狂战士负责编号为1的驱逐者，第二个狂战士负责编号为3的驱逐者; 
+S1={01},S2={01}，代表编号为0的狂战士的魔法可以克制编号为0和编号为1的天之驱逐者，编号为1的狂战士的魔法可以克制编号为0和编号为1的天之驱逐者，共有两种方案：01,10。 
+ 
+输入描述: 
+多组测试数据，请处理到文件结束。 
+ 
+对于每组测试数据： 
+ 
+第一行为一个整数N，代表狂战士的数量。 
+ 
+第二行为N个字符串，第i个字符串表示第i个狂战士能够克制的天之驱逐者的集合。 
+ 
+保证： 
+ 
+1<=N<=6，1<=每个字符串的长度<=6，且每个字符都是0~5中的一个数字。 
+ 
+ 
+输出描述: 
+输出一个整数，代表分配方案数 
+ 
+输入例子: 
+2 
+01 23 
+2 
+01 01 
+3 
+3 015 5 
+ 
+输出例子: 
+4 
+2 
+2 
+
+
+
+解答思想
+： 首先这里需要进行文件的读取， 读取之后进行每组的排列组合。 
+1） 利用string 进行前两行的读取， 然后转化为个数，和vector 的具体情况。
+2） 利用递归的思想进行非重复的排列组合，这里每一层只进行一个元素的选取，如果能够选取到最底层，这里就让其方案 加 1.
+
+#include<iostream>
+#include<vector>
+#include<string>
+#include<fstream>
+
+using namespace std;
+
+void combinationGroup(int _fighter_number, vector<vector<int> > datasets, vector<int> select, int &number);
+
+
+int main()
+{
+	//首先将情况输入到文件中
+	//打开文件
+	
+	string str;
+
+	ofstream test_file("test.txt");
+	test_file.clear();
+	getline(cin,str);
+	while(str != "#")
+	{
+		test_file << str << endl;
+		getline(cin,str);
+	}
+
+	test_file.close();
+	
+	//从文件中读取，并且进行处理
+	ifstream input_file("test.txt");
+	string data_group_number;
+	string data_info;
+	while( !input_file.eof())
+	{
+		//两行信息两行信息的进行读取，这样可以每次处理一个情况
+		getline(input_file, data_group_number);
+		if (data_group_number == "")
+			break;
+		getline(input_file, data_info);
+		int group_number = atoi(data_group_number.c_str());
+		//const char *group_info = data_info.c_str();
+		//int datasets[group_number][10];
+		vector<vector<int> > datasets(group_number); //这组信息的具体属性相克情况
+		int info_i = 0;
+		int count = 0;
+
+		for (int info_i = 0; info_i < data_info.length(); info_i++)
+		{
+			if(data_info[info_i] == ' ')
+			{
+				count++;
+				continue;
+			}
+			datasets[count].push_back((data_info[info_i]-'0'));
+
+		}
+		vector<int> select;
+		int number = 0;
+
+		combinationGroup(group_number, datasets, select, number);  //进行组合
+		cout << number << endl;
+	}
+	system("pause");
+	
+	return 0;
+}
+
+
+void combinationGroup(int _fighter_number, vector<vector<int> > datasets, vector<int> select, int &number)
+{
+	if (_fighter_number > 0)
+	{
+		for (int vec_group_i = 0; vec_group_i < datasets[0].size(); vec_group_i++)
+		{
+			int index_find_common =0;
+			//检查是否之前有重复的样本已经添加了
+			for (int find_i =0; find_i < select.size(); find_i++)
+			{
+				if (datasets[0][vec_group_i] == select[find_i])
+					break;
+				else
+					index_find_common++;
+			} //end for
+			//表示没有重复的样本
+			if (index_find_common == select.size())
+			{
+				select.push_back(datasets[0][vec_group_i]);
+				vector<vector<int> > data_sets_next;
+				for (int size_data_i = 1; size_data_i < datasets.size(); size_data_i++)
+				{
+					data_sets_next.push_back(datasets[size_data_i]);
+				}
+
+				//这一层已经完毕，进入下一层
+				combinationGroup(_fighter_number-1, data_sets_next, select, number);
+				//这个很关键， 如果这一层完毕了，看看这一层的其他的元素能否实现这个情况，能的话也进行加一
+				select.pop_back();
+			}
+		} //end for
+	 } //end if
+	 else
+	 {
+		 number++;
+		 //select.clear();
+		 //cout << number;
+		 return;
+	 }
+}
