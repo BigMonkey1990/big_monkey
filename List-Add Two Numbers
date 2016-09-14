@@ -1,0 +1,135 @@
+#include<iostream>
+
+#include<algorithm>
+using namespace std;
+
+/*
+Add Two Numbers
+	You are given two linked lists representing two non-negative numbers.
+	The digits are stored in reverse order and each of their nodes contain a single digit.
+	Add the two numbers and return it as a linked list.
+
+Input: (2 -> 4 -> 3) + (5 -> 6 -> 4)
+Output: 7 -> 0 -> 8
+*/
+//分析： 相加两个链表，要进行进位的考虑
+// LeetCode, Add Two Numbers
+// 跟Add Binary 很类似
+// 时间复杂度O(m+n)，空间复杂度O(1)
+
+//首先定义一个链表结构体
+//Definition for singly-linked list.
+struct ListNode 
+{
+	int val;
+	ListNode *next;
+	ListNode(int x) : val(x), next(NULL) {}
+};
+
+//这里有个链表的逐渐添加next 元素的过程，需要注意，首先要建立一个与要输出的
+//链表的同指针链表，然后这个就是一个移动的过程，每次在此基础上进行添加，然后
+//再传递给我们要输出的那个链表。
+class Solution
+{
+public:
+	ListNode* addTwoNumbers(ListNode *l1, ListNode *l2)
+	{
+		//如果有一个为null;
+		if (l1 == NULL) return l2;
+		if (l2 == NULL) return l1;
+
+		ListNode *sum(NULL);      //要输出链表
+		ListNode *end_node = sum;  //这个链表的一个指针，可以进行添加 next 节点进行下续的过程
+		int carry = 0;
+		
+		int index_l1 = 0;
+		int index_l2 = 0;
+		int value_l1 = 0;
+		int value_l2 = 0;
+		while (l1 != NULL || l2 != NULL)
+		{
+			if (l1->next == NULL && index_l1 == 0)
+			{
+				index_l1 = 1;
+				value_l1 = l1->val;
+				l1 = l1->next;
+			}
+			else if (index_l1 == 1)
+			{
+				value_l1 = 0;
+			}
+			else
+			{
+				value_l1 = l1->val;
+				l1 = l1->next;
+			}
+
+
+			if (l2->next == NULL && index_l2 == 0)
+			{
+				index_l2 = 1;
+				value_l2 = l2->val;
+				l2 = l2->next;
+			}
+			else if (index_l2 == 1)
+			{
+				value_l2 = 0;
+			}
+			else
+			{
+				value_l2 = l2->val;
+				l2 = l2->next;
+			}
+
+		
+			int ans =  (value_l1+value_l2+carry)%10;
+			ListNode *node_one = new ListNode(ans);
+			if (sum == NULL)
+				sum = end_node =node_one;
+			else
+			{
+				end_node->next = node_one;    //这两句进行不断的接续节点的一个更新的过程。
+				end_node = node_one;
+			}
+			carry = (value_l1+value_l2+carry)/10;
+
+			//sum->next = new ListNode(0);
+
+		}
+
+
+		if (carry > 0)
+			end_node->next = new ListNode(carry);
+
+		return sum;
+	}
+};
+
+
+int main()
+{
+	ListNode * ln1 = new ListNode(2);
+	ListNode * l12 = new ListNode(4);
+	ListNode * l13 = new ListNode(3);
+	ListNode * ln2 = new ListNode(5);
+	ListNode * l22 = new ListNode(6);
+	ListNode * l23 = new ListNode(7);
+	ln1->next = l12;
+	l12->next = l13;
+	ln2->next = l22;
+	l22->next = l23;
+	
+
+	Solution s;
+	ListNode *ans = s.addTwoNumbers(ln1, ln2);
+
+	while (NULL != ans) 
+	{
+		cout << ans->val << " ";
+		ans = ans->next;
+	}
+
+
+	system("pause");
+	return 0;
+}
