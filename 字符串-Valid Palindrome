@@ -1,0 +1,62 @@
+#include<iostream>
+#include<algorithm>
+#include<string>
+using namespace std;
+/*
+Valid Palindrome
+	Given a string, determine if it is a palindrome, considering only alphanumeric characters and ignoring cases.
+
+	For example,
+	"A man, a plan, a canal: Panama" is a palindrome.
+	"race a car" is not a palindrome.
+
+Note:
+Have you consider that the string might be empty? This is a good question to ask during an interview.
+
+	For the purpose of this problem, we define empty string as valid palindrome.
+
+*/
+//判断是否为回文，利用一个指针来前后分别对应，如果能够每次每个各查找一次
+//就能判断是回文的情况。
+//这里有个重要的要考虑的就是， 空字符串的问题的情况下，我们应该怎样。
+// Leet Code, Valid Palindrome
+// 时间复杂度O(n)，空间复杂度O(1)
+
+//解题思路， 两边各方一个指针，分别两边回缩，看最后能否相遇，相遇则为true.
+
+class Solution
+{
+public:
+	bool isPalindrome(string str)
+	{
+		int left = 0;
+		int right = str.size()-1;
+		//进行字符串的转化，大写字符全部转化为小写，利用stl中transform
+		transform(str.begin(), str.end(), str.begin(), ::tolower);
+
+		while(left < right)
+		{
+			//首先将空格和标点进行删除，利用isalnum函数进行删除
+			//因为if else 所以每次只减一个，这样执行完了，下次还会进行检验。
+			if (!::isalnum(str[left]))  ++left;
+			else if (!::isalnum(str[right])) --right;
+			else if (str[left] != str[right]) return false;
+			else{ left++, right--; }
+			
+		}
+
+		return true;
+	}
+};
+
+int main()
+{
+
+	string str = "A man, a plan, a canal: Panama";
+	Solution test;
+	cout << test.isPalindrome(str) << endl;
+
+	system("pause");
+	return 0;
+}
+//输出结果： Derived
