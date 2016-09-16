@@ -1,0 +1,60 @@
+#include<iostream>
+#include<string>
+#include<stack>
+using namespace std;
+/*
+Valid Parentheses
+Given a string containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
+
+The brackets must close in the correct order, "()" and "()[]{}" are all valid but "(]" and "([)]" are not.
+*/
+//判断是否是一对的情况，这里用栈进行不同字符的添加，当与最
+//上面的一个存在相互匹配的情况，就将其出栈， 这样最后检查
+//栈是否为空的情况，来进行确认。
+// 时间复杂度O(n)，空间复杂度O(n)
+
+// 这里面用到了新的类型，auto这个变量来进行s 中的char 的逐个检索
+//引用就是别名。所以用到引用的时候其实就是对其本体进行修改
+//auto &i : s  i这里就是s中个每个元素的别名。修改了i那么就是修改了s的每个器官。
+//auto i : s 则是新变量。i无法影响到s
+
+class Solution
+{
+public:
+	bool isValid(string const&str)
+	{
+		string left = "([{";
+		string right = ")]}";
+		stack<char> stk;
+
+		for (int i = 0; i < str.size(); i++)
+		{
+			//string 进行find查找， npos 表示出错，没有找到，这里对应的是找到的情况
+			if (left.find(str[i]) != string::npos) 
+			{
+					stk.push (str[i]);
+			} 
+			else 
+			{
+				//string find 查找，返回的是下标的位置。
+				if (stk.empty () || stk.top () != left[right.find (str[i])])
+					return false;
+				else
+					stk.pop ();
+			}
+		}
+		return stk.empty();
+	}
+};
+
+int main()
+{
+
+	string str = "{}{}{}{{}}[))]";
+	Solution test;
+	cout << test.isValid(str) << endl;
+
+	system("pause");
+	return 0;
+}
+//输出结果： Derived
